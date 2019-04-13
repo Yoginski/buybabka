@@ -1,0 +1,17 @@
+{
+	"name": "buybulktoaws",
+	"version": "1.0.0",
+	"description": "This is a boilerplate of an Apify actor.",
+	"main": "index.js",
+	"dependencies": {
+		"amqplib": "^0.5.3",
+		"apify": "^0.11.0",
+		"mongoose": "^5.5.1"
+	},
+	"devDependencies": {},
+	"scripts": {
+		"start": "node index.js"
+	},
+	"author": "",
+	"license": "ISC"
+}
