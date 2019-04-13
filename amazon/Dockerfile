@@ -10,15 +10,20 @@ RUN apt-get update && \
 
 RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
     && mkdir -p /home/pptruser/Downloads \
+    && mkdir -p /home/pptruser/app/amazon \
     && chown -R pptruser:pptruser /home/pptruser
+
+WORKDIR /home/pptruser/app/amazon
+
+COPY amazon ./
+COPY common /home/pptruser/app/common
+
+RUN npm --quiet set progress=false
+RUN npm link ../common
 
 USER pptruser
 
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-RUN npm --quiet set progress=false \
- && npm install --only=prod --no-optional \
+RUN npm install --only=prod --no-optional \
  && echo "Installed NPM packages:" \
  && npm list \
  && echo "Node.js version:" \

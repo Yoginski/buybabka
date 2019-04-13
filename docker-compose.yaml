@@ -11,15 +11,23 @@ services:
     image: rabbitmq:3
 
   buybulk:
-    build: buybulk
+    build:
+      context: .
+      dockerfile: buybulk/Dockerfile
     volumes:
-      - ./buybulk:/usr/src/app
+      - ./buybulk:/usr/src/app/buybulk
+      - ./common:/usr/src/app/common
     depends_on:
       - db
       - rabbitmq
 
   amazon:
-    build: amazon
+    build:
+      context: .
+      dockerfile: amazon/Dockerfile
+    volumes:
+      - ./amazon:/home/pptruser/app/amazon
+      - ./common:/home/pptruser/app/common
 
 volumes:
   mongo_data:

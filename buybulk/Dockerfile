@@ -1,9 +1,13 @@
 FROM apify/actor-node-basic
 
-COPY package*.json ./
+WORKDIR /usr/src/app/buybulk
 
-RUN npm --quiet set progress=false \
- && npm install --only=prod --no-optional \
+COPY buybulk ./
+COPY common /usr/src/app/common
+
+RUN npm --quiet set progress=false
+RUN npm link ../common
+RUN npm install --only=prod --no-optional \
  && echo "Installed NPM packages:" \
  && npm list \
  && echo "Node.js version:" \

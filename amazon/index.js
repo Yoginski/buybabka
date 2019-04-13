@@ -1,7 +1,10 @@
 "use strict";
-const { producer, BUYBULK_QUEUE_NAME } = require('../common/rabbitmq');
+const { amqpInit, consumer, BUYBULK_QUEUE_NAME } = require('../common/rabbitmq');
 
 (async function () {
+    await amqpInit();
     const channel = await consumer(BUYBULK_QUEUE_NAME);
-    const testData = Buffer.from('test data');
+    channel.consume(BUYBULK_QUEUE_NAME, (msg) => {
+        console.log(msg);
+    })
 }());

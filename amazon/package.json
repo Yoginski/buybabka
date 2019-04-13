@@ -4,11 +4,8 @@
 	"description": "Buybabka amazon parser",
 	"main": "index.js",
 	"dependencies": {
-		"amqplib": "^0.5.3",
-		"apify": "^0.11.0",
-		"mongoose": "^5.5.1"
+		"@buybabka/common": "file:../common"
 	},
-	"devDependencies": {},
 	"scripts": {
 		"start": "node index.js"
 	},
