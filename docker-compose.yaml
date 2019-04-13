@@ -20,3 +20,6 @@ services:
 
   amazon:
     build: amazon
+
+volumes:
+  mongo_data:

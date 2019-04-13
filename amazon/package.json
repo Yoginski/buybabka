@@ -1,7 +1,7 @@
 {
-	"name": "@buybabka/buybulk",
+	"name": "@buybabka/amazon",
 	"version": "1.0.0",
-	"description": "Buybabka buybulkamerica parser",
+	"description": "Buybabka amazon parser",
 	"main": "index.js",
 	"dependencies": {
 		"amqplib": "^0.5.3",
