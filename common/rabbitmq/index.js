@@ -49,7 +49,4 @@ module.exports = {
     amqpInit,
     createPublisher,
     createConsumer,
-
-    BUYBULK_QUEUE_NAME: 'buybulk',
-    AMAZON_QUEUE_NAME: 'amazon',
-}
+};

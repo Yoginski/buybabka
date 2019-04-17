@@ -19,7 +19,6 @@ COPY amazon ./
 COPY common /home/pptruser/app/common
 
 RUN npm --quiet set progress=false
-RUN npm link ../common
 
 USER pptruser
 

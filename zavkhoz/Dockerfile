@@ -1,8 +1,8 @@
-FROM apify/actor-node-basic
+FROM node:10
 
-WORKDIR /usr/src/app/buybulk
+WORKDIR /usr/src/app/zavkhoz
 
-COPY buybulk ./
+COPY zavkhoz ./
 COPY common /usr/src/app/common
 
 RUN npm --quiet set progress=false

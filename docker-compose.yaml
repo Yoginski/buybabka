@@ -2,13 +2,16 @@ version: '3'
 
 services:
 
-  db:
-    image: mongo:4
+  zavkhoz:
+    build:
+      context: .
+      dockerfile: zavkhoz/Dockerfile
     volumes:
-      - mongo_data:/data/db
-
-  rabbitmq:
-    image: rabbitmq:3
+      - ./zavkhoz:/usr/src/app/zavkhoz
+      - ./common:/usr/src/app/common
+    depends_on:
+      - db
+      - rabbitmq
 
   buybulk:
     build:
@@ -18,7 +21,6 @@ services:
       - ./buybulk:/usr/src/app/buybulk
       - ./common:/usr/src/app/common
     depends_on:
-      - db
       - rabbitmq
 
   amazon:
@@ -28,6 +30,16 @@ services:
     volumes:
       - ./amazon:/home/pptruser/app/amazon
       - ./common:/home/pptruser/app/common
+    depends_on:
+      - rabbitmq
+
+  db:
+    image: mongo:4
+    volumes:
+      - mongo_data:/data/db
+
+  rabbitmq:
+    image: rabbitmq:3
 
 volumes:
   mongo_data:

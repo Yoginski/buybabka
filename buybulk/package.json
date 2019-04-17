@@ -3,9 +3,6 @@
 	"version": "1.0.0",
 	"description": "Buybabka buybulkamerica parser",
 	"main": "index.js",
-	"dependencies": {
-		"@buybabka/common": "file:../common"
-	},
 	"scripts": {
 		"start": "node index.js"
 	},
