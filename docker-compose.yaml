@@ -40,6 +40,9 @@ services:
 
   rabbitmq:
     image: rabbitmq:3
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
 
 volumes:
   mongo_data:
+  rabbitmq_data:
