@@ -17,11 +17,10 @@ const SOURCES_TO_MODELS = {
             const content = JSON.parse(msg.content);
             const model = SOURCES_TO_MODELS[content.source]
             if (model) {
-                console.log(content);
                 new model(content)
                     .save()
                     .then(record => {
-                        console.log(`Saved ${record._id}`);
+                        console.log(`Saved ${record.title}`);
                         chan.ack(msg);
                     })
                     .catch(console.log.bind(console));
