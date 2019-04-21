@@ -20,6 +20,8 @@ services:
     volumes:
       - ./buybulk:/usr/src/app/buybulk
       - ./common:/usr/src/app/common
+    environment:
+      - APIFY_LOCAL_STORAGE_DIR=/tmp/apify_data
     depends_on:
       - rabbitmq
 

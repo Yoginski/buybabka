@@ -20,7 +20,7 @@ const SOURCES_TO_MODELS = {
                 new model(content)
                     .save()
                     .then(record => {
-                        console.log(`Saved ${record.title}`);
+//                        console.log(`Saved ${record.title}`);
                         chan.ack(msg);
                     })
                     .catch(console.log.bind(console));

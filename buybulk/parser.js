@@ -15,7 +15,7 @@ module.exports = async function (callback) {
         let weeklySpecialsPageCountAdded = false;
 
         const crawler = new Apify.CheerioCrawler({
-            //        maxRequestsPerCrawl: 10,
+            maxRequestsPerCrawl: 30,
             minConcurrency: 20,
             maxConcurrency: 30,
             requestList,
@@ -27,7 +27,40 @@ module.exports = async function (callback) {
                     untrimmedData.substring(untrimmedData.indexOf('['), untrimmedData.length - 1)
                 );
                 data.forEach((d) => {
-                    callback(d);
+                    const {
+                        savings,
+                        price,
+                        units,
+                        url,
+                        displayable_title,
+                        regular_price,
+                        price_per_unit,
+                        average_rating,
+                        rating_count,
+                        picture_url,
+                        quantity_available,
+                        item_id,
+                        case_id,
+                        restricted_shipping,
+                    } = d;
+                    const item = {
+                        savings,
+                        price,
+                        units,
+                        url,
+                        title: displayable_title,
+                        upc: url.match(/https?:\/\/\w*\.?buybulkamerica\.com\/(\w+)\/.*/)[1],
+                        regularPrice: regular_price,
+                        pricePerUnit: price_per_unit,
+                        averageRating: average_rating,
+                        ratingCount: rating_count,
+                        pictureUrl: picture_url,
+                        quantityAvailable: quantity_available,
+                        itemId: item_id,
+                        caseId: case_id,
+                        restrictedShipping: [ JSON.stringify(restricted_shipping) ],
+                    };
+                    callback(item);
                 });
 
                 const paginationLinks = $('div.pagination > a');

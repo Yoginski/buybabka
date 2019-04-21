@@ -41,6 +41,7 @@ const createConsumer = async function (queue) {
         return Promise.reject(`Queue ${queue} binding failed!`);
     return {
         chan,
+        getter: chan.get.bind(chan, queue),
         consumer: chan.consume.bind(chan, queue),
     };
 };
