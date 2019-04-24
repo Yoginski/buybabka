@@ -1,0 +1,68 @@
+{
+    "vhosts": [
+        {
+            "name": "/"
+        }
+    ],
+    "users": [
+        {
+            "name": "guest",
+            "password": "guest",
+            "tags": "administrator"
+        }
+    ],
+    "permissions": [
+        {
+            "user": "guest",
+            "vhost": "/",
+            "configure": ".*",
+            "write": ".*",
+            "read": ".*"
+        }
+    ],
+    "exchanges": [
+        {
+            "name": "items",
+            "vhost": "/",
+            "type": "fanout",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        }
+    ],
+    "queues": [
+        {
+            "name": "amazon",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {}
+        },
+        {
+            "name": "zavkhoz",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {}
+        }
+    ],
+    "bindings": [
+        {
+            "source": "items",
+            "vhost": "/",
+            "destination": "amazon",
+            "destination_type": "queue",
+            "routing_key": "amazon",
+            "arguments": {}
+        },
+        {
+            "source": "items",
+            "vhost": "/",
+            "destination": "zavkhoz",
+            "destination_type": "queue",
+            "routing_key": "zavkhoz",
+            "arguments": {}
+        }
+    ]
+}
