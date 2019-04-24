@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm --quiet set progress=true
+RUN npm --quiet set progress=false
 RUN npm install --only=prod --no-optional \
  && echo "Installed NPM packages:" \
  && npm list \

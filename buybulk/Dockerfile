@@ -1,8 +1,18 @@
 FROM apify/actor-node-basic
 
-WORKDIR /usr/src/app/buybulk
+WORKDIR /usr/src/app
 
-COPY entrypoint.sh ./
+COPY package*.json ./
+
 RUN npm --quiet set progress=true
+RUN npm install --only=prod --no-optional \
+ && echo "Installed NPM packages:" \
+ && npm list \
+ && echo "Node.js version:" \
+ && node --version \
+ && echo "NPM version:" \
+ && npm --version
 
-CMD [ "/bin/sh", "entrypoint.sh" ]
+COPY . ./
+
+CMD [ "npm", "start" ]

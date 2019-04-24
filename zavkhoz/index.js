@@ -1,17 +1,19 @@
 "use strict";
-const { dbInit, AmazonItem, BuybulkItem } = require('../common/mongo');
-const { amqpInit, createConsumer } = require('../common/rabbitmq');
+const { dbInit, AmazonItem, BuybulkItem } = require('./mongo');
+const { amqpConnect, createConsumer } = require('./rabbitmq');
 
 
+const QUEUE_NAME = 'zavkhoz';
 const SOURCES_TO_MODELS = {
     amazon: AmazonItem,
     buybulk: BuybulkItem,
 };
 
+
 (async function() {
-    await amqpInit();
     await dbInit();
-    const { chan, consumer } = await createConsumer('zavkhoz');
+    const conn = await amqpConnect();
+    const { chan, consumer } = await createConsumer(conn, QUEUE_NAME);
     consumer((msg) => {
         if (msg !== null) {
             const content = JSON.parse(msg.content);

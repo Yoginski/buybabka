@@ -1,29 +1,41 @@
 "use strict";
-const { amqpInit, createPublisher, createConsumer } = require('../common/rabbitmq');
 const puppeteer = require('puppeteer');
 const sleep = require('util').promisify(setTimeout);
-
-(async () => {
-})();
+const { amqpConnect, createPublisher, createConsumer } = require('./rabbitmq');
 
 
+const EXCHANGE = 'items';
 const SOURCE = 'amazon';
 const SCREENSHOT_DIR = 'debug_screenshots';
 const JOB_QUERY_INTERVAL = 1000; // RabbitMQ querying interval (ms)
 const JOB_PROCESSING_INTERVAL = 2000; // Pause between parsing jobs (ms)
+const CAPTCHA_RETRY_INTERVAL = 60000;
 
 
-const setDeliveryCounry = async (page) => {
+const setDeliveryCounry = async page => {
     await page.goto(`https://www.amazon.com/`);
-    await page.screenshot({ path: `${SCREENSHOT_DIR}/region_set_1.png` });
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/setDeliveryCountry-1.png` });
     await page.waitFor('#nav-global-location-slot', {visible: true});
     await page.click('#nav-global-location-slot');
     await page.waitFor('#GLUXZipUpdateInput', {visible: true});
     await page.type('#GLUXZipUpdateInput', '90001'); // Los Angeles
-    await page.screenshot({ path: `${SCREENSHOT_DIR}/region_set_2.png` });
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/setDeliveryCountry-2.png` });
     await page.click('#GLUXZipUpdate-announce')
-    await page.screenshot({ path: `${SCREENSHOT_DIR}/region_set_3.png` });
-}
+};
+
+
+const setDeliveryCounryWithRetries = async page => {
+    while (true) {
+        try {
+            await setDeliveryCounry(page);
+            return;
+        } catch (e) {
+            console.log(e);
+            await page.screenshot({path: `${SCREENSHOT_DIR}/setDeliveryCountry-error.png`});
+            await sleep(CAPTCHA_RETRY_INTERVAL);
+        }
+    }
+};
 
 
 const parseUpc = async (page, upc) => {
@@ -85,11 +97,12 @@ const parseUpc = async (page, upc) => {
 
     const page = await browser.newPage();
     await page.setViewport({ width: 1920, height: 1080 });
-    await setDeliveryCounry(page);
+    await setDeliveryCounryWithRetries(page);
 
-    await amqpInit();
-    const { chan, getter } = await createConsumer(SOURCE);
-    const { publisher } = await createPublisher();
+    const conn = await amqpConnect();
+    const { chan, getter } = await createConsumer(conn, SOURCE);
+    const { publisher } = await createPublisher(conn, EXCHANGE);
+
     while (true) {
         const msg = await getter()
         if (!msg) {

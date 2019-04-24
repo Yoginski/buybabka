@@ -4,22 +4,12 @@ services:
 
   zavkhoz:
     build: zavkhoz
-    volumes:
-      - ./zavkhoz:/usr/src/app/zavkhoz
-      - ./common:/usr/src/app/common
-      - common_node_modules:/usr/src/app/common/node_modules
-      - zavkhoz_node_modules:/usr/src/app/zavkhoz/node_modules
     depends_on:
       - db
       - rabbitmq
 
   buybulk:
     build: buybulk
-    volumes:
-      - ./buybulk:/usr/src/app/buybulk
-      - ./common:/usr/src/app/common
-      - common_node_modules:/usr/src/app/common/node_modules
-      - buybulk_node_modules:/usr/src/app/buybulk/node_modules
     environment:
       - APIFY_LOCAL_STORAGE_DIR=/tmp/apify_data
     depends_on:
@@ -28,10 +18,7 @@ services:
   amazon:
     build: amazon
     volumes:
-      - ./amazon:/usr/src/app/amazon
-      - ./common:/usr/src/app/common
-      - common_node_modules:/usr/src/app/common/node_modules
-      - amazon_node_modules:/usr/src/app/amazon/node_modules
+      - ./amazon/debug_screenshots:/home/pptruser/app/debug_screenshots
     depends_on:
       - rabbitmq
 
@@ -41,14 +28,10 @@ services:
       - mongo_data:/data/db
 
   rabbitmq:
-    image: rabbitmq:3
+    build: rabbitmq
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
 volumes:
   mongo_data:
   rabbitmq_data:
-  zavkhoz_node_modules:
-  amazon_node_modules:
-  buybulk_node_modules:
-  common_node_modules:

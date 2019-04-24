@@ -1,1 +1,1 @@
-docker-compose up --scale amazon=1 --force-recreate
+docker-compose up --scale amazon=1 --build

@@ -6,9 +6,10 @@
   "scripts": {
     "start": "node index.js"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "@buybabka/common": "file:../common"
-  }
+    "amqplib": "^0.5.3",
+    "mongoose": "^5.5.3"
+  },
+  "author": "",
+  "license": "ISC"
 }

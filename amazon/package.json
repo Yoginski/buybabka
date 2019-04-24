@@ -6,10 +6,10 @@
 	"scripts": {
 		"start": "node index.js"
 	},
-	"author": "",
-	"license": "ISC",
 	"dependencies": {
 		"puppeteer": "^1.14.0",
-		"@buybabka/common": "file:../common"
-	}
+		"amqplib": "^0.5.3"
+	},
+	"author": "",
+	"license": "ISC"
 }

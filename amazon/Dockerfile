@@ -8,9 +8,27 @@ RUN apt-get update && \
       libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /usr/src/app/amazon
+RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
+    && mkdir -p /home/pptruser/Downloads \
+    && mkdir -p /home/pptruser/app \
+    && chown -R pptruser:pptruser /home/pptruser
 
-COPY entrypoint.sh ./
+WORKDIR /home/pptruser/app
+
+COPY package*.json ./
+
 RUN npm --quiet set progress=true
+RUN npm install --only=prod --no-optional \
+ && echo "Installed NPM packages:" \
+ && npm list \
+ && echo "Node.js version:" \
+ && node --version \
+ && echo "NPM version:" \
+ && npm --version
 
-CMD [ "/bin/sh", "entrypoint.sh" ]
+COPY . ./
+RUN chown -R pptruser:pptruser ./debug_screenshots
+
+USER pptruser
+
+CMD [ "npm", "start" ]
