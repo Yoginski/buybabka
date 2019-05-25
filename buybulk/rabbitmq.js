@@ -23,11 +23,11 @@ const amqpConnect = async function () {
     return Promise.reject("RabbitMQ connection retry limit exceeded");
 }
 
-const createPublisher = async function (conn, exchange) {
+const createPublisher = async function (conn, exchange, routingKey) {
     const chan = await conn.createChannel();
     return {
         chan,
-        publisher: chan.publish.bind(chan, exchange, ''),
+        publisher: chan.publish.bind(chan, exchange, routingKey),
     };
 };
 

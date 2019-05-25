@@ -5,8 +5,8 @@ const { amqpConnect, createConsumer } = require('./rabbitmq');
 
 const QUEUE_NAME = 'zavkhoz';
 const SOURCES_TO_MODELS = {
-    amazon: AmazonItem,
-    buybulk: BuybulkItem,
+    'amazon.compared': AmazonItem,
+    'buybulk.new': BuybulkItem,
 };
 
 
@@ -17,12 +17,12 @@ const SOURCES_TO_MODELS = {
     consumer((msg) => {
         if (msg !== null) {
             const content = JSON.parse(msg.content);
-            const model = SOURCES_TO_MODELS[content.source]
+            const model = SOURCES_TO_MODELS[msg.fields.routingKey]
             if (model) {
                 new model(content)
                     .save()
                     .then(record => {
-//                        console.log(`Saved ${record.title}`);
+                        console.log(`Saved ${record.title}`);
                         chan.ack(msg);
                     })
                     .catch(console.log.bind(console));

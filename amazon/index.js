@@ -5,7 +5,8 @@ const { amqpConnect, createPublisher, createConsumer } = require('./rabbitmq');
 
 
 const EXCHANGE = 'items';
-const SOURCE = 'amazon';
+const QUEUE_NAME = 'amazon_comparer';
+const ROUTING_KEY = 'amazon.compared';
 const SCREENSHOT_DIR = 'debug_screenshots';
 const JOB_QUERY_INTERVAL = 1000; // RabbitMQ querying interval (ms)
 const JOB_PROCESSING_INTERVAL = 2000; // Pause between parsing jobs (ms)
@@ -13,6 +14,7 @@ const CAPTCHA_RETRY_INTERVAL = 60000;
 
 
 const setDeliveryCounry = async page => {
+    await sleep(1000);
     await page.goto(`https://www.amazon.com/`);
     await page.screenshot({ path: `${SCREENSHOT_DIR}/setDeliveryCountry-1.png` });
     await page.waitFor('#nav-global-location-slot', {visible: true});
@@ -39,8 +41,9 @@ const setDeliveryCounryWithRetries = async page => {
 
 
 const parseUpc = async (page, upc) => {
-    await page.goto(`https://www.amazon.com/s?k=${upc}`);
-    return page.evaluate(() => {
+    const url = `https://www.amazon.com/s?k=${upc}`;
+    await page.goto(url);
+    const result = page.evaluate(() => {
         try {
             const isNoResults = document
                 .querySelector('#search').innerText
@@ -89,6 +92,9 @@ const parseUpc = async (page, upc) => {
             }
         }
     });
+
+    if (result.data) result.data.url = url;
+    return result;
 }
 
 
@@ -100,8 +106,8 @@ const parseUpc = async (page, upc) => {
     await setDeliveryCounryWithRetries(page);
 
     const conn = await amqpConnect();
-    const { chan, getter } = await createConsumer(conn, SOURCE);
-    const { publisher } = await createPublisher(conn, EXCHANGE);
+    const { chan, getter } = await createConsumer(conn, QUEUE_NAME);
+    const { publisher } = await createPublisher(conn, EXCHANGE, ROUTING_KEY);
 
     while (true) {
         const msg = await getter()
@@ -110,25 +116,29 @@ const parseUpc = async (page, upc) => {
             continue;
         }
         const content = JSON.parse(msg.content);
-        if (content.source !== SOURCE) {
-            const result = await parseUpc(page, content.upc);
-            console.log(result);
-            if (result.success) {
-                if (result.data) {
-                    const item = {
-                        ...result.data,
-                        source: SOURCE,
-                        upc: content.upc,
-                    }
-                    await publisher(Buffer.from(JSON.stringify(item)));
+        const result = await parseUpc(page, content.upc);
+        console.log(result);
+        if (result.success) {
+            if (result.data) {
+                const item = {
+                    ...result.data,
+                    upc: content.upc,
+                    discountPrice: content.price,
+                    discountUrl: content.url,
                 }
+                await publisher(Buffer.from(JSON.stringify(item)));
+                await page.screenshot({path: `${SCREENSHOT_DIR}/${content.upc}-${result.hint}.png`});
                 await chan.ack(msg);
             } else {
-                await page.screenshot({path: `${SCREENSHOT_DIR}/${content.upc}-${result.hint}.png`});
-                console.log(`UPC #${content.upc} parsing error (${result.hint}): ${result.message}`);
+                await page.screenshot({ path: `${SCREENSHOT_DIR}/${content.upc}-${result.hint}.png` });
+                console.log(`Undefined behavior! UPC: ${content.upc}`)
                 await chan.reject(msg);
             }
-            await sleep(JOB_PROCESSING_INTERVAL);
+        } else {
+            await page.screenshot({path: `${SCREENSHOT_DIR}/${content.upc}-${result.hint}.png`});
+            console.log(`UPC #${content.upc} parsing error (${result.hint}): ${result.message}`);
+            await chan.reject(msg);
         }
+        await sleep(JOB_PROCESSING_INTERVAL);
     };
 }());

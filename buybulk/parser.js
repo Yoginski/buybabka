@@ -15,7 +15,7 @@ module.exports = async function (callback) {
         let weeklySpecialsPageCountAdded = false;
 
         const crawler = new Apify.CheerioCrawler({
-            maxRequestsPerCrawl: 30,
+            maxRequestsPerCrawl: 5,
             minConcurrency: 20,
             maxConcurrency: 30,
             requestList,

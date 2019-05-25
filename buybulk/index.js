@@ -5,14 +5,13 @@ const { amqpConnect, createPublisher } = require('./rabbitmq');
 
 
 const EXCHANGE = 'items';
-const SOURCE = 'buybulk';
+const ROUTING_KEY = 'buybulk.new';
 
 
 (async function () {
     const conn = await amqpConnect();
-    const { publisher } = await createPublisher(conn, EXCHANGE);
+    const { publisher } = await createPublisher(conn, EXCHANGE, ROUTING_KEY);
     parser(item => {
-        item.source = SOURCE;
         publisher(Buffer.from(JSON.stringify(item)));
     });
 }());

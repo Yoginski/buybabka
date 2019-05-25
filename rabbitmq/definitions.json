@@ -22,9 +22,18 @@
     ],
     "exchanges": [
         {
+            "name": "commands",
+            "vhost": "/",
+            "type": "topic",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        },
+        {
             "name": "items",
             "vhost": "/",
-            "type": "fanout",
+            "type": "topic",
             "durable": true,
             "auto_delete": false,
             "internal": false,
@@ -33,14 +42,36 @@
     ],
     "queues": [
         {
-            "name": "amazon",
+            "name": "buybulk_request",
             "vhost": "/",
             "durable": true,
             "auto_delete": false,
             "arguments": {}
         },
         {
+            "name": "telegram_response",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {}
+        },
+
+        {
             "name": "zavkhoz",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {}
+        },
+        {
+            "name": "telegram_compared",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {}
+        },
+        {
+            "name": "amazon_comparer",
             "vhost": "/",
             "durable": true,
             "auto_delete": false,
@@ -48,12 +79,31 @@
         }
     ],
     "bindings": [
+
+        {
+            "source": "commands",
+            "vhost": "/",
+            "destination": "buybulk_request",
+            "destination_type": "queue",
+            "routing_key": "buybulk.request",
+            "arguments": {}
+        },
+        {
+            "source": "commands",
+            "vhost": "/",
+            "destination": "telegram_response",
+            "destination_type": "queue",
+            "routing_key": "*.response",
+            "arguments": {}
+        },
+
+
         {
             "source": "items",
             "vhost": "/",
-            "destination": "amazon",
+            "destination": "amazon_comparer",
             "destination_type": "queue",
-            "routing_key": "amazon",
+            "routing_key": "*.new",
             "arguments": {}
         },
         {
@@ -61,8 +111,17 @@
             "vhost": "/",
             "destination": "zavkhoz",
             "destination_type": "queue",
-            "routing_key": "zavkhoz",
+            "routing_key": "#",
+            "arguments": {}
+        },
+        {
+            "source": "items",
+            "vhost": "/",
+            "destination": "telegram_compared",
+            "destination_type": "queue",
+            "routing_key": "*.compared",
             "arguments": {}
         }
+
     ]
 }
