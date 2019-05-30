@@ -27,7 +27,8 @@ RUN npm install --only=prod --no-optional \
  && npm --version
 
 COPY . ./
-RUN chown -R pptruser:pptruser ./debug_screenshots
+RUN mkdir ./debug_screenshots \
+    && chown -R pptruser:pptruser ./debug_screenshots
 
 USER pptruser
 
