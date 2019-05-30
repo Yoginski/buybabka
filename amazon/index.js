@@ -41,7 +41,7 @@ const setDeliveryCounryWithRetries = async page => {
 
 
 const parseUpc = async (page, upc) => {
-    const url = `https://www.amazon.com/s?k=${upc}`;
+    const url = `https://www.amazon.com/s?k=${upc}&s=price-asc-rank`;
     await page.goto(url);
     const result = page.evaluate(() => {
         try {
@@ -51,6 +51,7 @@ const parseUpc = async (page, upc) => {
             if (isNoResults) {
                 return {
                     success: true,
+                    hint: 'nosuchitem',
                     data: null,
                 }
             }
@@ -58,12 +59,14 @@ const parseUpc = async (page, upc) => {
             if (!item) {
                 return {
                     success: false,
-                    hint: 'noitemfound',
+                    hint: 'invalidsearchresult',
                     message: "couldn't find search result element",
                 }
             }
             const asin = item.getAttribute('data-asin').trim();
             const priceStr = item.querySelector('.a-price > .a-offscreen').innerText.trim();
+            const relativeUrl = item.querySelector('.a-link-normal').getAttribute('href');
+            const url = "https://www.amazon.com" + relativeUrl;
             let price = 0;
             if (priceStr.startsWith('$')) {
                 price = parseFloat(priceStr.slice(1));
@@ -78,7 +81,9 @@ const parseUpc = async (page, upc) => {
             const title = item.querySelector('.a-text-normal').innerText.trim();
             return {
                 success: true,
+                hint: 'itemfound',
                 data: {
+                    url,
                     asin,
                     price,
                     title,
@@ -93,7 +98,7 @@ const parseUpc = async (page, upc) => {
         }
     });
 
-    if (result.data) result.data.url = url;
+//    if (result.data) result.data.url = url;
     return result;
 }
 
@@ -126,14 +131,11 @@ const parseUpc = async (page, upc) => {
                     discountPrice: content.price,
                     discountUrl: content.url,
                 }
+                console.log(item);
                 await publisher(Buffer.from(JSON.stringify(item)));
-                await page.screenshot({path: `${SCREENSHOT_DIR}/${content.upc}-${result.hint}.png`});
-                await chan.ack(msg);
-            } else {
-                await page.screenshot({ path: `${SCREENSHOT_DIR}/${content.upc}-${result.hint}.png` });
-                console.log(`Undefined behavior! UPC: ${content.upc}`)
-                await chan.reject(msg);
             }
+            await page.screenshot({path: `${SCREENSHOT_DIR}/${content.upc}-${result.hint}.png`});
+            await chan.ack(msg);
         } else {
             await page.screenshot({path: `${SCREENSHOT_DIR}/${content.upc}-${result.hint}.png`});
             console.log(`UPC #${content.upc} parsing error (${result.hint}): ${result.message}`);
