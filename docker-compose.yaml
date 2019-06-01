@@ -24,9 +24,6 @@ services:
 
   telegram:
     build: telegram
-    environment:
-      - BOT_TOKEN=766678366:AAHYUUDPN2-tPrrEVEQ3D3q_Ifl3VDoJ56M
-      - CHANNEL_ID=-1001325158009
     depends_on:
       - rabbitmq
 
