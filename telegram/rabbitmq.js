@@ -27,7 +27,9 @@ const createPublisher = async function (conn, exchange, routingKey) {
     const chan = await conn.createChannel();
     return {
         chan,
-        publisher: chan.publish.bind(chan, exchange, routingKey),
+        publisher: (data) => {
+            chan.publish(exchange, routingKey, data, { persistent: true })
+        },
     };
 };
 

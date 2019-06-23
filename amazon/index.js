@@ -64,7 +64,9 @@ const parseUpc = async (page, upc) => {
                 }
             }
             const asin = item.getAttribute('data-asin').trim();
-            const priceStr = item.querySelector('.a-price > .a-offscreen').innerText.trim();
+            const priceTag = item.querySelector('.a-price > .a-offscreen')
+                || item.querySelector('.a-spacing-top-mini .a-color-base');
+            const priceStr = priceTag.innerText.trim()
             const relativeUrl = item.querySelector('.a-link-normal').getAttribute('href');
             const url = "https://www.amazon.com" + relativeUrl;
             let price = 0;
