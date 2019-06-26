@@ -130,7 +130,7 @@ const parseUpc = async (page, upc) => {
                 const item = {
                     ...result.data,
                     upc: content.upc,
-                    discountPrice: content.price,
+                    discountPrice: content.pricePerUnit,
                     discountUrl: content.url,
                 }
                 console.log(item);
