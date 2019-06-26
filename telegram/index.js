@@ -21,23 +21,38 @@ const itemMenu = (urls) => Telegraf.Extra
     const { chan, consumer } = await createConsumer(conn, ITEM_QUEUE_NAME);
     consumer(async (msg) => {
         const data = JSON.parse(msg.content);
-        const text = `\`\`\`
-${data.title}
-
-UPC: ${data.upc}
-
-Amazon  price: ${data.price}
-Buybulk price: ${data.discountPrice}
-\`\`\``;
-        const result = await bot.telegram.sendMessage(
-            process.env.CHANNEL_ID,
-            text,
-            itemMenu([
-                { name: 'Amazon', url: data.url || 'http://no.url' },
-                { name: 'Buybulk', url: data.discountUrl || 'http://no.url' },
-            ])
-        );
-        console.log(result);
+        try {
+            let discountPercent = 0;
+            if (data.price > 0) {
+                discountPercent = (data.price - data.discountPrice) / data.price * 100;
+            }
+            console.log(`Discount for item with UPC ${data.upc}: ${discountPercent}`);
+            if (discountPercent > 15) {
+                const text = `\`\`\`
+        ${data.title}
+        
+        UPC: ${data.upc}
+        
+        Real discount: ${discountPercent}%
+        Amazon  price: $${data.price}
+        Buybulk price: $${data.discountPrice}
+        \`\`\``;
+                const result = await bot.telegram.sendMessage(
+                    process.env.CHANNEL_ID,
+                    text,
+                    itemMenu([
+                        { name: 'Amazon', url: data.url || 'http://no.url' },
+                        { name: 'Buybulk', url: data.discountUrl || 'http://no.url' },
+                    ])
+                );
+                console.log(result);
+            } else {
+                console.log(`Discount is too low for UPC ${data.upc}: ${discountPercent}`);
+            }
+        } catch (e) {
+            console.log(`Failed to process item with UPC ${data.upc}: ${e}`);
+            throw e;
+        }
         
         chan.ack(msg);
     });

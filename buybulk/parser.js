@@ -16,8 +16,8 @@ module.exports = async function (departmentUrl, callback) {
 
         const crawler = new Apify.CheerioCrawler({
 //            maxRequestsPerCrawl: 5,
-            minConcurrency: 20,
-            maxConcurrency: 30,
+            minConcurrency: 1,
+            maxConcurrency: 5,
             requestList,
             requestQueue,
             handlePageFunction: async ({ $ }) => {
