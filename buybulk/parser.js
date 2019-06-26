@@ -1,14 +1,14 @@
 "use strict";
 const Apify = require('apify');
 
-function getWeeklySpecialsPageUrl(page) {
-    return `https://www.buybulkamerica.com/weekly_specials?page=${page}`;
+function getWeeklySpecialsPageUrl(departmentUrl, page) {
+    return `${departmentUrl}?page=${page}`;
 }
 
-module.exports = async function (callback) {
+module.exports = async function (departmentUrl, callback) {
     Apify.main(async () => {
         const requestList = await Apify.openRequestList('categories', [
-            getWeeklySpecialsPageUrl(1),
+            getWeeklySpecialsPageUrl(departmentUrl, 1),
         ]);
         const requestQueue = await Apify.openRequestQueue();
 
@@ -69,7 +69,7 @@ module.exports = async function (callback) {
                     const weeklySpecialsPageCount = parseInt($(lastPageLink).text());
                     weeklySpecialsPageCountAdded = true;
                     for (let i = 2; i <= weeklySpecialsPageCount; i++) {
-                        const url = getWeeklySpecialsPageUrl(i);
+                        const url = getWeeklySpecialsPageUrl(departmentUrl, i);
                         await requestQueue.addRequest({ url });
                     }
                 }
