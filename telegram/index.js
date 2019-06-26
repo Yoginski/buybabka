@@ -26,17 +26,18 @@ const itemMenu = (urls) => Telegraf.Extra
             if (data.price > 0) {
                 discountPercent = (data.price - data.discountPrice) / data.price * 100;
             }
+            discountPercent = discountPercent.toFixed(2);
             console.log(`Discount for item with UPC ${data.upc}: ${discountPercent}`);
             if (discountPercent > 15) {
                 const text = `\`\`\`
-        ${data.title}
-        
-        UPC: ${data.upc}
-        
-        Real discount: ${discountPercent}%
-        Amazon  price: $${data.price}
-        Buybulk price: $${data.discountPrice}
-        \`\`\``;
+${data.title}
+
+UPC: ${data.upc}
+
+Real discount: ${discountPercent}%
+Amazon  price: $${data.price}
+Buybulk price: $${data.discountPrice}
+\`\`\``;
                 const result = await bot.telegram.sendMessage(
                     process.env.CHANNEL_ID,
                     text,
