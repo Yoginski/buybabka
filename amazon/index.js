@@ -10,7 +10,7 @@ const ROUTING_KEY = 'amazon.compared';
 const SCREENSHOT_DIR = 'debug_screenshots';
 const JOB_QUERY_INTERVAL = 1000; // RabbitMQ querying interval (ms)
 const JOB_PROCESSING_INTERVAL = 2000; // Pause between parsing jobs (ms)
-const CAPTCHA_RETRY_INTERVAL = 60000;
+const CAPTCHA_RETRY_INTERVAL = 120000;
 
 
 const setDeliveryCounry = async page => {
@@ -170,7 +170,7 @@ const parseUpc = async (page, upc) => {
             await page.screenshot({path: `${SCREENSHOT_DIR}/${content.upc}-${result.hint}.png`});
             console.log(`UPC #${content.upc} parsing error (${result.hint}): ${result.message}`);
             await chan.reject(msg);
-            // probably a captcha
+            console.log('Most likely a captcha (see screenshots)');
             await sleep(CAPTCHA_RETRY_INTERVAL);
         }
         await sleep(JOB_PROCESSING_INTERVAL);
