@@ -2,6 +2,7 @@
 const puppeteer = require('puppeteer');
 const sleep = require('util').promisify(setTimeout);
 const { amqpConnect, createPublisher, createConsumer } = require('./rabbitmq');
+const evasions = require('./evasions');
 
 
 const EXCHANGE = 'items';
@@ -137,6 +138,7 @@ const parseUpc = async (page, upc) => {
     const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
 
     const page = await browser.newPage();
+    await evasions(page);
     await page.setViewport({ width: 1920, height: 1080 });
     await setDeliveryCounryWithRetries(page);
 
