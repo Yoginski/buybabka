@@ -89,10 +89,30 @@ const parseUpc = async (page, upc) => {
             }
 
             const title = item.querySelector('.a-text-normal').innerText.trim();
+            const ratingItem = item.querySelector('.a-spacing-top-micro .a-size-small');
+            let rating = 0;
+            let rates = 0;
+            if (ratingItem) {
+                const ratingValueItem = ratingItem.querySelector('span .a-icon-alt');
+                if (ratingValueItem) {
+                    const ratingValueMatch = ratingValueItem.innerText.match(/([\d\.]+) out of ([\d\.]+) stars/);
+                    if (ratingValueMatch && ratingValueMatch.length === 3) {
+                        rating = parseFloat(ratingValueMatch[1]).toFixed(1);
+                    }
+                }
+                const ratingCountItem = ratingItem.querySelector('span .a-size-base');
+                if (ratingCountItem) {
+                    if (ratingCountItem.innerText.match(/\d+/)) {
+                        rates = parseInt(ratingCountItem.innerText);
+                    }
+                }
+            }
             return {
                 success: true,
                 hint: 'itemfound',
                 data: {
+                    rating,
+                    rates,
                     url,
                     asin,
                     price,
@@ -150,6 +170,8 @@ const parseUpc = async (page, upc) => {
             await page.screenshot({path: `${SCREENSHOT_DIR}/${content.upc}-${result.hint}.png`});
             console.log(`UPC #${content.upc} parsing error (${result.hint}): ${result.message}`);
             await chan.reject(msg);
+            // probably a captcha
+            await sleep(CAPTCHA_RETRY_INTERVAL);
         }
         await sleep(JOB_PROCESSING_INTERVAL);
     };
