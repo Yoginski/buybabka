@@ -8,7 +8,8 @@
 	},
 	"dependencies": {
 		"amqplib": "^0.5.3",
-		"apify": "^0.13.7"
+		"apify": "^0.13.7",
+		"dotenv": "^8.0.0"
 	},
 	"author": "",
 	"license": "ISC"

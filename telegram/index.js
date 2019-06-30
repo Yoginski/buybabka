@@ -1,11 +1,13 @@
+"use strict";
+const process = require('process');
 const Telegraf = require('telegraf');
 const { amqpConnect, createConsumer } = require('./rabbitmq');
 
 
 const CMD_EXCHANGE_NAME = 'commands';
 const ITEM_QUEUE_NAME = 'telegram_compared';
-const DISCOUNT_PERCENT_THRESHOLD = 20;
-const DISCOUNT_AMT_THRESHOLD = 2.5;
+const DISCOUNT_PERCENT_THRESHOLD = process.env.DISCOUNT_PERCENT_THRESHOLD || 20;
+const DISCOUNT_AMT_THRESHOLD = process.env.DISCOUNT_PERCENT_THRESHOLD || 2.5;
 
  
 const itemMenu = (urls) => Telegraf.Extra
