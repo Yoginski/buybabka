@@ -8,6 +8,9 @@ const CMD_EXCHANGE_NAME = 'commands';
 const ITEM_QUEUE_NAME = 'telegram_compared';
 const DISCOUNT_PERCENT_THRESHOLD = process.env.DISCOUNT_PERCENT_THRESHOLD || 20;
 const DISCOUNT_AMT_THRESHOLD = process.env.DISCOUNT_PERCENT_THRESHOLD || 2.5;
+const RATING_GOOD_EMOJI = '🌕';
+const RATING_BAD_EMOJI = '🌑';
+const RATING_HALF_EMOJI = '🌗';
 
  
 const itemMenu = (urls) => Telegraf.Extra
@@ -40,15 +43,24 @@ const itemMenu = (urls) => Telegraf.Extra
                 console.log(`Discount amount is less than the threshold ($${DISCOUNT_AMT_THRESHOLD}) for UPC ${data.upc}`);
             } else {
                 console.log(`Discount is fine for UPC ${data.upc}`);
-                const text = `\`\`\`
-${data.title}
+                if (data.rating > 5) {
+                    console.log(`POSSIBLE BUG: rating for UPC ${data.upc} is higher than 5 (${data.rating})`)
+                    data.rating = 5;
+                }
+                const emojiRating = toEmojiRating(data.rating);
+                const text = `
+*${data.title}*
+
+\`\`\`
+${emojiRating} (${data.rates})
 
 UPC: ${data.upc}
 
-Discount %:    ${discountPercent.toFixed(2)}%
-Discount USD:  $${discountAmt.toFixed(2)}
-Amazon  price: $${data.price.toFixed(2)}
-Buybulk price: $${data.discountPrice.toFixed(2)}
+Discount %:      ${discountPercent.toFixed(2)}%
+Discount USD:    $${discountAmt.toFixed(2)}
+
+Amazon  price:   $${data.price.toFixed(2)}
+Buybulk price:   $${data.discountPrice.toFixed(2)}
 \`\`\``;
                 const result = await bot.telegram.sendMessage(
                     process.env.CHANNEL_ID,
@@ -68,3 +80,15 @@ Buybulk price: $${data.discountPrice.toFixed(2)}
         chan.ack(msg);
     });
 }())
+
+function toEmojiRating(rating) {
+    let emojiRating = '';
+    const intPart = Math.floor(rating);
+    const decPart = rating - intPart;
+    emojiRating += RATING_GOOD_EMOJI.repeat(intPart);
+    if (decPart > 0) {
+        emojiRating += RATING_HALF_EMOJI;
+    }
+    emojiRating += RATING_BAD_EMOJI.repeat(5 - Math.ceil(rating));
+    return emojiRating;
+}
