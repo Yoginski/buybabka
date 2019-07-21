@@ -1,0 +1,16 @@
+{
+	"name": "@buybabka/koleimports",
+	"version": "1.0.0",
+	"description": "Buybabka koleimports parser",
+	"main": "index.js",
+	"scripts": {
+		"start": "node -r dotenv/config index.js"
+	},
+	"dependencies": {
+		"amqplib": "^0.5.3",
+		"apify": "^0.13.7",
+		"dotenv": "^8.0.0"
+	},
+	"author": "",
+	"license": "ISC"
+}
