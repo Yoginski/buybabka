@@ -40,10 +40,10 @@ async function processMessage(bot, chan, msg) {
             console.log(`Discount percent is less than the threshold (${DISCOUNT_PERCENT_THRESHOLD}%) for UPC ${data.upc}`);
         } else if (discountAmt < DISCOUNT_AMT_THRESHOLD) {
             console.log(`Discount amount is less than the threshold ($${DISCOUNT_AMT_THRESHOLD}) for UPC ${data.upc}`);
-        } else if (data.rating < RATES_THRESHOLD) {
-            console.log(`Need more rates (${RATES_THRESHOLD}) for UPC ${data.upc} (has ${data.rating})`);
-        } else if (data.rates < RATING_THRESHOLD) {
-            console.log(`Rating is too low (${RATING_THRESHOLD}) for UPC ${data.upc} (has ${data.rates})`);
+        } else if (data.rates < RATES_THRESHOLD) {
+            console.log(`Need more rates (${RATES_THRESHOLD}) for UPC ${data.upc} (has ${data.rates})`);
+        } else if (data.rating < RATING_THRESHOLD) {
+            console.log(`Rating is too low (${RATING_THRESHOLD}) for UPC ${data.upc} (has ${data.rating})`);
         } else {
             console.log(`Discount is fine for UPC ${data.upc}`);
             if (data.rating > 5) {
