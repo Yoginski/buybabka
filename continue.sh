@@ -1,1 +1,1 @@
-docker-compose up --scale amazon=1
+docker-compose up --scale buybulk=0 --scale amazon=1

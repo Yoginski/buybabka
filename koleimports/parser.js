@@ -10,7 +10,7 @@ function getItemUrl(itemId) {
 }
 
 function getDepartmentPageUrl(departmentUrl, page) {
-    return `${departmentUrl}?page=${page}`;
+    return `${departmentUrl}?p=${page}`;
 }
 
 module.exports = async function (departmentUrl, callback) {
@@ -27,17 +27,17 @@ module.exports = async function (departmentUrl, callback) {
 
         const crawler = new Apify.CheerioCrawler({
 //            maxRequestsPerCrawl: 10,
-            minConcurrency: 1,
+            minConcurrency: 3,
             maxConcurrency: 5,
             requestList,
             requestQueue,
             handlePageFunction: async ({ $, request }) => {
                 if (request.userData.pageType === 'item') {
                     console.log(`Parsing item #${request.userData.itemId}`);
-                    parseItem($, request, callback);
+                    await parseItem($, request, callback);
                 } else {
                     console.log(`Parsing page #${request.userData.pageNum}`);
-                    parsePage($, departmentUrl, request, requestQueue);
+                    await parsePage($, departmentUrl, request, requestQueue);
                 }
             },
         });
@@ -50,19 +50,21 @@ async function parsePage($, departmentUrl, request, queue) {
     if ($(NO_RESULTS_MESSAGE_SELECTOR).length > 0) {
         console.log('Last page parsed');
     } else {
-        $('a.quickview.product-image.popup-image').each((_, href) => {
+        await Promise.all($('a.quickview.product-image.popup-image').map((_, href) => {
             const itemId = $(href).attr('product-id');
             console.log(`Queueing item #${itemId}`);
-            queue.addRequest({
+            return queue.addRequest({
                 url: getItemUrl(itemId),
                 userData: { itemId, pageType: 'item' },
             });
-        });
+        }).get());
         const newPageNum = request.userData.pageNum + 1;
+        console.log(`Queueing ${getDepartmentPageUrl(departmentUrl, newPageNum)}`);
         await queue.addRequest({
             url: getDepartmentPageUrl(departmentUrl, newPageNum),
             userData: { pageType: 'page', pageNum: newPageNum },
         });
+        console.log(`Page #${request.userData.pageNum} processed`);
     }
 }
 
@@ -74,7 +76,20 @@ async function parseItem($, request, callback) {
         }
         return label.parent('.attribute').find('span').text();
     }; 
-    const pricePerUnit = parseFloat($('.current-limited-price').text().slice(1));
+    const priceElem = $('.new-popup-unit-price')
+    let priceStr = priceElem.text().slice(13).trim();
+    if (priceStr === "") {
+        const parentPriceElem = priceElem.parent().get(0);
+        if (parentPriceElem.tagName === 'h2') {
+            priceStr = $(parentPriceElem).text().slice(19).trim();
+        } else {
+            priceStr = $(parentPriceElem).text().slice(13).trim();
+        }
+    }
+    const pricePerUnit = parseFloat(priceStr);
+    if (!pricePerUnit) {
+        throw `Invalid price per unit: ${pricePerUnit}`;
+    }
     const item = {
         pricePerUnit,
         url: request.url,
