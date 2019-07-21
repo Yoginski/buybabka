@@ -56,14 +56,14 @@ Discount %:      ${discountPercent.toFixed(2)}%
 Discount USD:    $${discountAmt.toFixed(2)}
 
 Amazon  price:   $${data.price.toFixed(2)}
-Buybulk price:   $${data.discountPrice.toFixed(2)}
+${data.discountSite} price:   $${data.discountPrice.toFixed(2)}
 \`\`\``;
             const result = await bot.telegram.sendMessage(
                 process.env.CHANNEL_ID,
                 text,
                 itemMenu([
                     { name: 'Amazon', url: data.url || 'http://no.url' },
-                    { name: 'Buybulk', url: data.discountUrl || 'http://no.url' },
+                    { name: data.discountSite, url: data.discountUrl || 'http://no.url' },
                 ])
             );
             console.log(result);

@@ -13,6 +13,6 @@ const ITEM_QUEUE_NAME = 'telegram_compared';
     const bot = new Telegraf(process.env.BOT_TOKEN);
     const conn = await amqpConnect();
     const { chan, consumer } = await createConsumer(conn, ITEM_QUEUE_NAME);
-    consumer(processMessage.bind(bot, chan));
+    consumer(processMessage.bind(null, bot, chan));
     commands(bot);
 }())

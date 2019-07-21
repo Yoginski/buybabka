@@ -8,6 +8,13 @@ services:
       - db
       - rabbitmq
 
+  koleimports:
+    build: koleimports
+    environment:
+      - APIFY_LOCAL_STORAGE_DIR=/tmp/apify_data
+    depends_on:
+      - rabbitmq
+
   buybulk:
     build: buybulk
     environment:
