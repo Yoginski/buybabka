@@ -48,6 +48,7 @@ module.exports = async function (departmentUrl, callback) {
                         price,
                         units,
                         url,
+                        discountSite: 'Buybulk',
                         title: displayable_title,
                         upc: url.match(/https?:\/\/\w*\.?buybulkamerica\.com\/(\w+)\/.*/)[1],
                         regularPrice: regular_price,

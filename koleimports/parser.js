@@ -79,6 +79,7 @@ async function parseItem($, request, callback) {
         pricePerUnit,
         url: request.url,
         upc: getItemValueByName('upc code'),
+        discountSite: 'Koleimports',
     }
     callback(item);
 }

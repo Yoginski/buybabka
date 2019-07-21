@@ -5,7 +5,7 @@ const { amqpConnect, createConsumer } = require('./rabbitmq');
 
 const QUEUE_NAME = 'zavkhoz';
 const SOURCES_TO_MODELS = {
-    'amazon.compared': AmazonItem,
+//    'amazon.compared': AmazonItem,
     'buybulk.new': BuybulkItem,
 };
 

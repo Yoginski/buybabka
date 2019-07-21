@@ -162,6 +162,7 @@ const parseUpc = async (page, upc) => {
                     upc: content.upc,
                     discountPrice: content.pricePerUnit,
                     discountUrl: content.url,
+                    discountSite: content.discountSite,
                 }
                 console.log(item);
                 await publisher(Buffer.from(JSON.stringify(item)));

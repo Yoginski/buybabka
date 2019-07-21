@@ -43,6 +43,8 @@ async function processMessage(bot, chan, msg) {
             }
             const emojiRating = toEmojiRating(data.rating);
             const text = `
+*${data.discountSite}*
+
 *${data.title}*
 
 \`\`\`
