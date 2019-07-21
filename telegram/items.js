@@ -4,8 +4,13 @@ const Telegraf = require('telegraf');
 
 
 const ITEM_QUEUE_NAME = 'telegram_compared';
+
 const DISCOUNT_PERCENT_THRESHOLD = process.env.DISCOUNT_PERCENT_THRESHOLD || 20;
 const DISCOUNT_AMT_THRESHOLD = process.env.DISCOUNT_PERCENT_THRESHOLD || 2.5;
+
+const RATES_THRESHOLD = process.env.RATES_THRESHOLD || 30;
+const RATING_THRESHOLD = process.env.RATING_THRESHOLD || 3;
+
 const RATING_GOOD_EMOJI = '🌕';
 const RATING_BAD_EMOJI = '🌑';
 const RATING_HALF_EMOJI = '🌗';
@@ -35,6 +40,10 @@ async function processMessage(bot, chan, msg) {
             console.log(`Discount percent is less than the threshold (${DISCOUNT_PERCENT_THRESHOLD}%) for UPC ${data.upc}`);
         } else if (discountAmt < DISCOUNT_AMT_THRESHOLD) {
             console.log(`Discount amount is less than the threshold ($${DISCOUNT_AMT_THRESHOLD}) for UPC ${data.upc}`);
+        } else if (data.rating < RATES_THRESHOLD) {
+            console.log(`Need more rates (${RATES_THRESHOLD}) for UPC ${data.upc}`);
+        } else if (data.rates < RATING_THRESHOLD) {
+            console.log(`Rating is too low (${RATING_THRESHOLD}) for UPC ${data.upc}`);
         } else {
             console.log(`Discount is fine for UPC ${data.upc}`);
             if (data.rating > 5) {
